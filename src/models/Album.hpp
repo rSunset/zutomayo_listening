@@ -12,6 +12,7 @@ namespace zutomayo::models
         std::string name;
         int releaseDate{0};
         int duration{0};
+        bool operator==(const Album&) const = default;
     };
 }
 
