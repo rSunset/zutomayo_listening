@@ -5,12 +5,12 @@
 
 namespace zutomayo::models
 {
-        enum class SchedulingAlgorithm
-        {
-            FCFS,
-            SPN,
-            SRT,
-            HRRN
-        };
+    enum class SchedulingAlgorithm
+    {
+        FCFS,
+        SPN,
+        SRT,
+        HRRN
+    };
 }
 
