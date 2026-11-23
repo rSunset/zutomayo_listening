@@ -12,5 +12,14 @@ namespace zutomayo::models
         SRT,
         HRRN
     };
+
+    struct ExecutionSegment
+    {
+        int album_id {0};
+        int start {0};
+        int end {0};
+
+        bool operator == (const ExecutionSegment&) const = default;
+    };
 }
 

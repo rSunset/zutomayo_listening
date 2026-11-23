@@ -9,6 +9,8 @@
 #include <vector>
 
 #include "logic/AlbumGenerator.hpp"
+#include "logic/Scheduling.hpp"
+#include "models/SchedulingTypes.hpp"
 
 namespace
 {
@@ -71,6 +73,46 @@ namespace
         assert(min_duration == 1);
         assert(max_duration == 10);
     }
+
+    using zutomayo::models::Album;
+    using zutomayo::models::ExecutionSegment;
+
+    void fcfs_runs_in_arrival_order_and_leaves_idle_gaps()
+    {
+        const std::vector<Album> albums{
+            {.id = 0, .name = "A", .releaseDate = 0,  .duration = 3},
+            {.id = 1, .name = "B", .releaseDate = 1,  .duration = 2},
+            {.id = 2, .name = "C", .releaseDate = 10, .duration = 1},
+        };
+        const std::vector<ExecutionSegment> expected{
+            {.album_id = 0, .start = 0,  .end = 3},
+            {.album_id = 1, .start = 3,  .end = 5},
+            {.album_id = 2, .start = 10, .end = 11},
+        };
+
+        assert(zutomayo::logic::simulate_fcfs(albums) == expected);
+    }
+
+    void fcfs_ignores_input_order_and_breaks_ties_by_id()
+    {
+        const std::vector<Album> albums{
+            {.id = 0, .name = "A", .releaseDate = 0, .duration = 2},
+            {.id = 2, .name = "C", .releaseDate = 4, .duration = 1},
+            {.id = 1, .name = "B", .releaseDate = 4, .duration = 3},
+        };
+        const std::vector<ExecutionSegment> expected{
+            {.album_id = 0, .start = 0, .end = 2},
+            {.album_id = 1, .start = 4, .end = 7},
+            {.album_id = 2, .start = 7, .end = 8},
+        };
+
+        assert(zutomayo::logic::simulate_fcfs(albums) == expected);
+    }
+
+    void fcfs_with_no_albums_gives_no_segments()
+    {
+        assert(zutomayo::logic::simulate_fcfs({}).empty());
+    }
 }
 
 int main()
@@ -78,6 +120,9 @@ int main()
     same_seed_gives_same_albums();
     empty_names_gives_empty_albums();
     values_stay_in_range_and_reach_the_extremes();
+    fcfs_runs_in_arrival_order_and_leaves_idle_gaps();
+    fcfs_ignores_input_order_and_breaks_ties_by_id();
+    fcfs_with_no_albums_gives_no_segments();
 
     std::cout << "All tests passed\n";
     return 0;

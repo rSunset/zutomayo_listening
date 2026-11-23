@@ -8,7 +8,9 @@ set(ZUTOMAYO_WARNINGS -Wall -Wextra -Wpedantic -Wconversion -Wshadow)
 
 find_package(SFML 2.6 COMPONENTS graphics window system REQUIRED)
 
-add_library(zutomayo_core STATIC src/logic/AlbumGenerator.cpp)
+add_library(zutomayo_core STATIC src/logic/AlbumGenerator.cpp
+        src/logic/Scheduling.cpp
+        src/logic/Scheduling.hpp)
 target_include_directories(zutomayo_core PUBLIC src)
 target_compile_options(zutomayo_core PRIVATE ${ZUTOMAYO_WARNINGS})
 
