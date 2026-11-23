@@ -1,0 +1,10 @@
+# Salida de compilación (se regenera siempre)
+cmake-build-*/
+build/
+
+# Configuración local del IDE
+.idea/
+
+# Binarios y objetos sueltos
+*.o
+*.a
