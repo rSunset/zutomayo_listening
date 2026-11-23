@@ -6,14 +6,6 @@
 
 namespace zutomayo::models
 {
-    enum class SchedulingAlgorithm
-    {
-        FCFS,
-        SPN,
-        SRT,
-        HRRN
-    };
-
     struct Album
     {
         int id{0};
