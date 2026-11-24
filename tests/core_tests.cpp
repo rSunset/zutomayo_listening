@@ -113,6 +113,45 @@ namespace
     {
         assert(zutomayo::logic::simulate_fcfs({}).empty());
     }
+
+    void spn_does_not_preempt_and_picks_shortest_ready_album()
+    {
+        const std::vector<Album> albums{
+            {.id = 0, .name = "A", .releaseDate = 0, .duration = 7},
+            {.id = 1, .name = "B", .releaseDate = 2, .duration = 4},
+            {.id = 2, .name = "C", .releaseDate = 4, .duration = 1},
+            {.id = 3, .name = "D", .releaseDate = 5, .duration = 4},
+        };
+        const std::vector<ExecutionSegment> expected{
+            {.album_id = 0, .start = 0,  .end = 7},
+            {.album_id = 2, .start = 7,  .end = 8},
+            {.album_id = 1, .start = 8,  .end = 12},
+            {.album_id = 3, .start = 12, .end = 16},
+        };
+
+        assert(zutomayo::logic::simulate_spn(albums) == expected);
+    }
+
+    void spn_waits_for_arrivals_and_breaks_ties_by_id()
+    {
+        const std::vector<Album> albums{
+            {.id = 0, .name = "A", .releaseDate = 0, .duration = 1},
+            {.id = 2, .name = "C", .releaseDate = 3, .duration = 2},
+            {.id = 1, .name = "B", .releaseDate = 3, .duration = 2},
+        };
+        const std::vector<ExecutionSegment> expected{
+            {.album_id = 0, .start = 0, .end = 1},
+            {.album_id = 1, .start = 3, .end = 5},
+            {.album_id = 2, .start = 5, .end = 7},
+        };
+
+        assert(zutomayo::logic::simulate_spn(albums) == expected);
+    }
+
+    void spn_with_no_albums_gives_no_segments()
+    {
+        assert(zutomayo::logic::simulate_spn({}).empty());
+    }
 }
 
 int main()
@@ -123,6 +162,9 @@ int main()
     fcfs_runs_in_arrival_order_and_leaves_idle_gaps();
     fcfs_ignores_input_order_and_breaks_ties_by_id();
     fcfs_with_no_albums_gives_no_segments();
+    spn_does_not_preempt_and_picks_shortest_ready_album();
+    spn_waits_for_arrivals_and_breaks_ties_by_id();
+    spn_with_no_albums_gives_no_segments();
 
     std::cout << "All tests passed\n";
     return 0;

@@ -10,4 +10,5 @@
 namespace zutomayo::logic
 {
     std::vector<models::ExecutionSegment> simulate_fcfs(const std::vector<models::Album>& albums);
+    std::vector<models::ExecutionSegment> simulate_spn(const std::vector<models::Album>& albums);
 }
