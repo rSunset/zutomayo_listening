@@ -85,4 +85,9 @@ namespace zutomayo::logic
         }
         return result;
     }
+
+    std::vector<models::ExecutionSegment> simulate_srt(const std::vector<models::Album>&)
+    {
+        return {};   // TODO: implementar SRT
+    }
 }
