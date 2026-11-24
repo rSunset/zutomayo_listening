@@ -152,6 +152,57 @@ namespace
     {
         assert(zutomayo::logic::simulate_spn({}).empty());
     }
+
+    void hrrn_prefers_long_waiting_albums_over_short_ones()
+    {
+        const std::vector<Album> albums{
+            {.id = 0, .name = "A", .releaseDate = 0, .duration = 3},
+            {.id = 1, .name = "B", .releaseDate = 2, .duration = 6},
+            {.id = 2, .name = "C", .releaseDate = 4, .duration = 4},
+            {.id = 3, .name = "D", .releaseDate = 6, .duration = 5},
+            {.id = 4, .name = "E", .releaseDate = 8, .duration = 2},
+        };
+        const std::vector<ExecutionSegment> expected{
+            {.album_id = 0, .start = 0,  .end = 3},
+            {.album_id = 1, .start = 3,  .end = 9},
+            {.album_id = 2, .start = 9,  .end = 13},
+            {.album_id = 4, .start = 13, .end = 15},
+            {.album_id = 3, .start = 15, .end = 20},
+        };
+
+        assert(zutomayo::logic::simulate_hrrn(albums) == expected);
+    }
+
+    void hrrn_breaks_equal_ratios_by_id()
+    {
+        const std::vector<Album> albums{
+            {.id = 0, .name = "A", .releaseDate = 0, .duration = 4},
+            {.id = 2, .name = "C", .releaseDate = 1, .duration = 2},
+            {.id = 1, .name = "B", .releaseDate = 1, .duration = 2},
+        };
+        const std::vector<ExecutionSegment> expected{
+            {.album_id = 0, .start = 0, .end = 4},
+            {.album_id = 1, .start = 4, .end = 6},
+            {.album_id = 2, .start = 6, .end = 8},
+        };
+
+        assert(zutomayo::logic::simulate_hrrn(albums) == expected);
+    }
+
+    void hrrn_waits_for_arrivals_and_handles_empty_input()
+    {
+        const std::vector<Album> albums{
+            {.id = 0, .name = "A", .releaseDate = 0, .duration = 1},
+            {.id = 1, .name = "B", .releaseDate = 5, .duration = 2},
+        };
+        const std::vector<ExecutionSegment> expected{
+            {.album_id = 0, .start = 0, .end = 1},
+            {.album_id = 1, .start = 5, .end = 7},
+        };
+
+        assert(zutomayo::logic::simulate_hrrn(albums) == expected);
+        assert(zutomayo::logic::simulate_hrrn({}).empty());
+    }
 }
 
 int main()
@@ -165,6 +216,9 @@ int main()
     spn_does_not_preempt_and_picks_shortest_ready_album();
     spn_waits_for_arrivals_and_breaks_ties_by_id();
     spn_with_no_albums_gives_no_segments();
+    hrrn_prefers_long_waiting_albums_over_short_ones();
+    hrrn_breaks_equal_ratios_by_id();
+    hrrn_waits_for_arrivals_and_handles_empty_input();
 
     std::cout << "All tests passed\n";
     return 0;

@@ -38,12 +38,45 @@ namespace zutomayo::logic
         int current_time = 0;
         while (!pending.empty())
         {
-            current_time = std::max(current_time, std::ranges::min_element(pending, {}, &models::Album::releaseDate)->releaseDate);
+            const auto earliest = std::ranges::min_element(pending, {}, &models::Album::releaseDate);
+            current_time = std::max(current_time, earliest->releaseDate);
             const auto next = std::ranges::min_element(
                 pending,std::ranges::less {},
                 [current_time](const models::Album& a){
                     const bool not_ready = a.releaseDate > current_time;
                     return std::tuple{not_ready, a.duration, a.releaseDate, a.id};
+            });
+
+            result.push_back(models::ExecutionSegment { .album_id = next->id, .start = current_time, .end = current_time + next->duration });
+            current_time = current_time + next->duration;
+            pending.erase(next);
+        }
+        return result;
+    }
+
+    std::vector<models::ExecutionSegment> simulate_hrrn(const std::vector<models::Album>& albums)
+    {
+        std::vector<models::Album> pending = albums;
+        std::vector<models::ExecutionSegment> result;
+        int current_time = 0;
+        while (!pending.empty())
+        {
+            const auto earliest = std::ranges::min_element(pending, {}, &models::Album::releaseDate);
+            current_time = std::max(current_time, earliest->releaseDate);
+            const auto next = std::ranges::min_element(
+                pending,
+                [current_time](const models::Album& a, const models::Album& b){
+                    const int a_wait = current_time - a.releaseDate;
+                    const int b_wait = current_time - b.releaseDate;
+
+                    const int a_score = (a_wait + a.duration) * b.duration;
+                    const int b_score = (b_wait + b.duration) * a.duration;
+
+                    if (a_score != b_score)
+                        return a_score > b_score;
+                    if (a.releaseDate != b.releaseDate)
+                        return a.releaseDate < b.releaseDate;
+                    return a.id < b.id;
             });
 
             result.push_back(models::ExecutionSegment { .album_id = next->id, .start = current_time, .end = current_time + next->duration });
