@@ -17,6 +17,7 @@ target_compile_options(zutomayo_core PRIVATE ${ZUTOMAYO_WARNINGS})
 add_executable(zutomayo_listening src/main.cpp)
 target_link_libraries(zutomayo_listening PRIVATE zutomayo_core sfml-graphics sfml-window sfml-system)
 target_compile_options(zutomayo_listening PRIVATE ${ZUTOMAYO_WARNINGS})
+target_compile_definitions(zutomayo_listening PRIVATE ZUTOMAYO_ASSET_DIR="${CMAKE_SOURCE_DIR}")
 
 enable_testing()
 add_executable(core_tests tests/core_tests.cpp)

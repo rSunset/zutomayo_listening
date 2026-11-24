@@ -1,49 +1,35 @@
+#include <SFML/Graphics.hpp>
 #include <iostream>
-#include "models/Album.hpp"
-#include "models/SchedulingTypes.hpp"
-#include "logic/AlbumGenerator.hpp"
+#include <string>
 
 int main()
 {
-    zutomayo::models::Album albumTest{.id = 0, .name= "Jinkougaku", .releaseDate = 0, .duration = 3};
-    zutomayo::models::SchedulingAlgorithm scheduling = zutomayo::models::SchedulingAlgorithm::FCFS;
-
-    std::vector<zutomayo::models::Album> albums = zutomayo::logic::generate_albums(
-        std::vector<std::string> {
-            "Hisohiso Banashi",
-            "Gusare",
-            "Jinkougaku",
-            "Meiko wa Gunaruga Gotoshi",
-            "Keisoudo"
-        },
-        42
-    );
-
-    std::printf("%-5s%-40s%-15s%s\n", "ID", "Name", "ReleaseDate", "Duration");
-    for (const auto& album : albums)
+    sf::Font font;
+    const std::string font_path = std::string {ZUTOMAYO_ASSET_DIR} + "/assets/regularsans.ttf";
+    if (!font.loadFromFile(font_path))
     {
-        std::printf("%-5d%-40s%-15d%-5d\n", album.id, album.name.c_str(), album.releaseDate, album.duration);
+        std::cout << "No se pudo cargar la fuente: " << font_path << "\n";
+        return 1;
     }
 
-    std::cout << albumTest.name << '\n';
-    std::cout << static_cast<int>(scheduling) << '\n';
+    sf::Text title("ZUTOMAYO listening", font, 28);
+    title.setPosition(20.F, 20.F);
 
-    albums = zutomayo::logic::generate_albums(
-        std::vector<std::string> {
-            "Hisohiso Banashi",
-            "Gusare",
-            "Jinkougaku",
-            "Meiko wa Gunaruga Gotoshi",
-            "Keisoudo"
-        },
-        42
-    );
+    sf::RenderWindow window(sf::VideoMode(900, 600), "ZUTOMAYO listening");
+    window.setFramerateLimit(60);
 
-    std::printf("%-5s%-40s%-15s%s\n", "ID", "Name", "ReleaseDate", "Duration");
-    for (const auto& album : albums)
+    while (window.isOpen())
     {
-        std::printf("%-5d%-40s%-15d%-5d\n", album.id, album.name.c_str(), album.releaseDate, album.duration);
-    }
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+                window.close();
+        }
 
+        window.clear(sf::Color(20, 20, 20));
+        window.draw(title);
+        window.display();
+    }
     return 0;
 }
