@@ -9,6 +9,7 @@
 
 #include "models/Album.hpp"
 #include "models/SchedulingTypes.hpp"
+#include "interface/CoverLibrary.hpp"
 
 namespace zutomayo::ui
 {
@@ -33,4 +34,8 @@ namespace zutomayo::ui
 
     void draw_gantt(sf::RenderTarget& target, const sf::Font& font, const GanttChart& chart,
                     const std::vector<models::Album>& albums, sf::Vector2f origin, int total_time);
+
+    void draw_album_table(sf::RenderTarget& target, const sf::Font& font,
+                      const std::vector<models::Album>& albums, const CoverLibrary& covers,
+                      sf::Vector2f origin);
 }

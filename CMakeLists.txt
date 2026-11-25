@@ -14,11 +14,7 @@ add_library(zutomayo_core STATIC src/logic/AlbumGenerator.cpp
 target_include_directories(zutomayo_core PUBLIC src)
 target_compile_options(zutomayo_core PRIVATE ${ZUTOMAYO_WARNINGS})
 
-add_executable(zutomayo_listening src/main.cpp
-        src/interface/AlbumLabel.hpp
-        src/interface/TableView.hpp
-        src/interface/Drawing.cpp
-        src/interface/Drawing.hpp)
+add_executable(zutomayo_listening src/main.cpp src/interface/Drawing.cpp src/interface/CoverLibrary.cpp)
 target_link_libraries(zutomayo_listening PRIVATE zutomayo_core sfml-graphics sfml-window sfml-system)
 target_compile_options(zutomayo_listening PRIVATE ${ZUTOMAYO_WARNINGS})
 target_compile_definitions(zutomayo_listening PRIVATE ZUTOMAYO_ASSET_DIR="${CMAKE_SOURCE_DIR}")

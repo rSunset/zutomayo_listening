@@ -8,3 +8,6 @@ build/
 # Binarios y objetos sueltos
 *.o
 *.a
+
+# Covers con copyright
+assets/covers/

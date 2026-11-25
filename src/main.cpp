@@ -45,6 +45,12 @@ namespace
 
         return simulation;
     }
+
+    struct CatalogEntry
+    {
+        std::string title;
+        std::string cover_file;
+    };
 }
 
 int main()
@@ -58,8 +64,21 @@ int main()
         return 1;
     }
 
-    const std::vector<std::string> titles{
-        "Hisohiso Banashi", "Gusare", "Jinkogaku", "Meiko wa Gunaruga Gotoshi", "Keisodo"};
+    const std::vector<CatalogEntry> catalog{
+        {"Hisohiso Banashi", "hisohisobanashi.jpg"},
+        {"Gusare", "gusare.jpg"},
+        {"Jinkougaku", "jinkougaku.jpg"},
+        {"Meiko wa Gunaruga Gotoshi", "meikowagunarugagotoshi.jpg"},
+        {"Keisoudo", "keisoudo.jpg"},
+    };
+
+    std::vector<std::string> titles;
+    std::vector<std::string> cover_files;
+    for (const CatalogEntry& entry : catalog)
+    {
+        titles.push_back(entry.title);
+        cover_files.push_back(entry.cover_file);
+    }
 
     std::random_device entropy;
     Simulation simulation = run_simulation(titles, static_cast<std::uint32_t>(entropy()));
@@ -71,6 +90,9 @@ int main()
 
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "zutomayo_listening");
     window.setFramerateLimit(60);
+
+    const zutomayo::ui::CoverLibrary covers(
+    std::filesystem::path{ZUTOMAYO_ASSET_DIR} / "assets" / "covers", cover_files);
 
     while (window.isOpen())
     {
@@ -92,7 +114,7 @@ int main()
         window.clear(sf::Color(20, 20, 30));
         window.draw(heading);
         zutomayo::ui::draw_button(window, font, generate_button);
-        zutomayo::ui::draw_album_table(window, font, simulation.albums, {20.F, 130.F});
+        zutomayo::ui::draw_album_table(window, font, simulation.albums, covers, {20.F, 130.F});
 
         for (std::size_t i = 0; i < simulation.charts.size(); ++i)
         {

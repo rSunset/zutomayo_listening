@@ -7,6 +7,15 @@
 
 #include "logic/Scheduling.hpp"
 
+namespace
+{
+    struct Job
+    {
+        zutomayo::models::Album album;
+        int remaining;
+    };
+}
+
 namespace zutomayo::logic
 {
     std::vector<models::ExecutionSegment> simulate_fcfs(const std::vector<models::Album>& albums)
@@ -86,32 +95,48 @@ namespace zutomayo::logic
         return result;
     }
 
+
     std::vector<models::ExecutionSegment> simulate_srt(const std::vector<models::Album>& albums)
     {
-        std::vector<models::Album> pending = albums;
+        std::vector<Job> pending;
+        pending.reserve(albums.size());
+        for (const models::Album& album : albums)
+            pending.push_back(Job{album, album.duration});
+
         std::vector<models::ExecutionSegment> result;
         int current_time = 0;
+
         while (!pending.empty())
         {
-            const auto earliest = std::ranges::min_element(pending, {}, &models::Album::releaseDate);
-            current_time = std::max(current_time, earliest->releaseDate);
-            const auto next = std::ranges::min_element(pending, {},
-                [current_time](const models::Album& a){
-                    const bool not_ready = a.releaseDate > current_time;
-                    return std::tuple{not_ready, a.duration, a.releaseDate, a.id};
-            });
+            const auto earliest = std::ranges::min_element(pending, {},
+                [](const Job& job) { return job.album.releaseDate; });
+            current_time = std::max(current_time, earliest->album.releaseDate);
 
-            if (!result.empty() && result.back().album_id == next->id && result.back().end == current_time)
+            const auto next = std::ranges::min_element(pending, {},
+                [current_time](const Job& job)
+                {
+                    const bool not_ready = job.album.releaseDate > current_time;
+                    return std::tuple{not_ready, job.remaining, job.album.releaseDate, job.album.id};
+                });
+
+            const int album_id = next->album.id;
+            if (!result.empty() && result.back().album_id == album_id && result.back().end == current_time)
             {
                 result.back().end = current_time + 1;
             }
             else
             {
-                result.push_back(models::ExecutionSegment {.album_id = next->id, .start = current_time, .end = current_time + 1});
+                result.push_back(models::ExecutionSegment{
+                    .album_id = album_id, .start = current_time, .end = current_time + 1});
             }
 
-            current_time = current_time + 1;
+            --next->remaining;
+            if (next->remaining == 0)
+                pending.erase(next);
+
+            current_time += 1;
         }
+
         return result;
     }
 }
